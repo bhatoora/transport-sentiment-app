@@ -48,125 +48,95 @@ INDIAN_STATES_CITIES = {
     'Ladakh': ['Leh', 'Kargil', 'Nubra', 'Zanskar']
 }
 
-# ---------- LOCATION DETECTION FUNCTION ----------
-def detect_location_from_text(text):
+# ---------- REGION DETECTION FUNCTION ----------
+def detect_region_from_text(text):
     """
-    Detect Indian state and city from tweet text
+    Detect region (state or major city) from tweet text
     """
     text_lower = text.lower()
     
     # Check for direct state mentions
     for state, cities in INDIAN_STATES_CITIES.items():
         if state.lower() in text_lower:
-            # Try to find specific city
-            for city in cities:
-                if city.lower() in text_lower:
-                    return state, city
-            return state, cities[0]  # Return capital/major city as default
+            return state
     
-    # Check for city mentions
+    # Check for city mentions and return the state
     for state, cities in INDIAN_STATES_CITIES.items():
         for city in cities:
             if city.lower() in text_lower:
-                return state, city
+                return f"{city}, {state}"
     
     # Check for common abbreviations and nicknames
     location_mappings = {
-        'mumbai': ('Maharashtra', 'Mumbai'),
-        'delhi': ('Delhi', 'New Delhi'),
-        'bangalore': ('Karnataka', 'Bangalore'),
-        'bengaluru': ('Karnataka', 'Bangalore'),
-        'chennai': ('Tamil Nadu', 'Chennai'),
-        'kolkata': ('West Bengal', 'Kolkata'),
-        'calcutta': ('West Bengal', 'Kolkata'),
-        'hyderabad': ('Telangana', 'Hyderabad'),
-        'pune': ('Maharashtra', 'Pune'),
-        'ahmedabad': ('Gujarat', 'Ahmedabad'),
-        'surat': ('Gujarat', 'Surat'),
-        'jaipur': ('Rajasthan', 'Jaipur'),
-        'lucknow': ('Uttar Pradesh', 'Lucknow'),
-        'kanpur': ('Uttar Pradesh', 'Kanpur'),
-        'nagpur': ('Maharashtra', 'Nagpur'),
-        'patna': ('Bihar', 'Patna'),
-        'indore': ('Madhya Pradesh', 'Indore'),
-        'bhopal': ('Madhya Pradesh', 'Bhopal'),
-        'ludhiana': ('Punjab', 'Ludhiana'),
-        'agra': ('Uttar Pradesh', 'Agra'),
-        'nashik': ('Maharashtra', 'Nashik'),
-        'vadodara': ('Gujarat', 'Vadodara'),
-        'gurgaon': ('Haryana', 'Gurgaon'),
-        'gurugram': ('Haryana', 'Gurgaon'),
-        'noida': ('Delhi', 'Noida'),
-        'faridabad': ('Haryana', 'Faridabad'),
-        'ghaziabad': ('Delhi', 'Ghaziabad'),
-        'rajkot': ('Gujarat', 'Rajkot'),
-        'kochi': ('Kerala', 'Kochi'),
-        'cochin': ('Kerala', 'Kochi'),
-        'coimbatore': ('Tamil Nadu', 'Coimbatore'),
-        'madurai': ('Tamil Nadu', 'Madurai'),
-        'jodhpur': ('Rajasthan', 'Jodhpur'),
-        'raipur': ('Chhattisgarh', 'Raipur'),
-        'kota': ('Rajasthan', 'Kota'),
-        'guwahati': ('Assam', 'Guwahati'),
-        'chandigarh': ('Punjab', 'Chandigarh'),
-        'thiruvananthapuram': ('Kerala', 'Thiruvananthapuram'),
-        'trivandrum': ('Kerala', 'Thiruvananthapuram'),
-        'mysore': ('Karnataka', 'Mysore'),
-        'mysuru': ('Karnataka', 'Mysore'),
-        'salem': ('Tamil Nadu', 'Salem'),
-        'meerut': ('Uttar Pradesh', 'Meerut'),
-        'jabalpur': ('Madhya Pradesh', 'Jabalpur'),
-        'gwalior': ('Madhya Pradesh', 'Gwalior'),
-        'vijayawada': ('Andhra Pradesh', 'Vijayawada'),
-        'visakhapatnam': ('Andhra Pradesh', 'Visakhapatnam'),
-        'vizag': ('Andhra Pradesh', 'Visakhapatnam'),
-        'ranchi': ('Jharkhand', 'Ranchi'),
-        'jamshedpur': ('Jharkhand', 'Jamshedpur'),
-        'dhanbad': ('Jharkhand', 'Dhanbad'),
-        'amritsar': ('Punjab', 'Amritsar'),
-        'jalandhar': ('Punjab', 'Jalandhar'),
-        'allahabad': ('Uttar Pradesh', 'Allahabad'),
-        'prayagraj': ('Uttar Pradesh', 'Allahabad'),
-        'varanasi': ('Uttar Pradesh', 'Varanasi'),
-        'banaras': ('Uttar Pradesh', 'Varanasi'),
-        'howrah': ('West Bengal', 'Howrah'),
-        'durgapur': ('West Bengal', 'Durgapur'),
-        'siliguri': ('West Bengal', 'Siliguri'),
-        'asansol': ('West Bengal', 'Asansol')
+        'mumbai': 'Mumbai, Maharashtra',
+        'delhi': 'Delhi',
+        'bangalore': 'Bangalore, Karnataka',
+        'bengaluru': 'Bangalore, Karnataka',
+        'chennai': 'Chennai, Tamil Nadu',
+        'kolkata': 'Kolkata, West Bengal',
+        'calcutta': 'Kolkata, West Bengal',
+        'hyderabad': 'Hyderabad, Telangana',
+        'pune': 'Pune, Maharashtra',
+        'ahmedabad': 'Ahmedabad, Gujarat',
+        'surat': 'Surat, Gujarat',
+        'jaipur': 'Jaipur, Rajasthan',
+        'lucknow': 'Lucknow, Uttar Pradesh',
+        'kanpur': 'Kanpur, Uttar Pradesh',
+        'nagpur': 'Nagpur, Maharashtra',
+        'patna': 'Patna, Bihar',
+        'indore': 'Indore, Madhya Pradesh',
+        'bhopal': 'Bhopal, Madhya Pradesh',
+        'ludhiana': 'Ludhiana, Punjab',
+        'agra': 'Agra, Uttar Pradesh',
+        'nashik': 'Nashik, Maharashtra',
+        'vadodara': 'Vadodara, Gujarat',
+        'gurgaon': 'Gurgaon, Haryana',
+        'gurugram': 'Gurgaon, Haryana',
+        'noida': 'Noida, Delhi',
+        'faridabad': 'Faridabad, Haryana',
+        'ghaziabad': 'Ghaziabad, Delhi',
+        'rajkot': 'Rajkot, Gujarat',
+        'kochi': 'Kochi, Kerala',
+        'cochin': 'Kochi, Kerala',
+        'coimbatore': 'Coimbatore, Tamil Nadu',
+        'madurai': 'Madurai, Tamil Nadu',
+        'jodhpur': 'Jodhpur, Rajasthan',
+        'raipur': 'Raipur, Chhattisgarh',
+        'kota': 'Kota, Rajasthan',
+        'guwahati': 'Guwahati, Assam',
+        'chandigarh': 'Chandigarh, Punjab',
+        'thiruvananthapuram': 'Thiruvananthapuram, Kerala',
+        'trivandrum': 'Thiruvananthapuram, Kerala',
+        'mysore': 'Mysore, Karnataka',
+        'mysuru': 'Mysore, Karnataka',
+        'salem': 'Salem, Tamil Nadu',
+        'meerut': 'Meerut, Uttar Pradesh',
+        'jabalpur': 'Jabalpur, Madhya Pradesh',
+        'gwalior': 'Gwalior, Madhya Pradesh',
+        'vijayawada': 'Vijayawada, Andhra Pradesh',
+        'visakhapatnam': 'Visakhapatnam, Andhra Pradesh',
+        'vizag': 'Visakhapatnam, Andhra Pradesh',
+        'ranchi': 'Ranchi, Jharkhand',
+        'jamshedpur': 'Jamshedpur, Jharkhand',
+        'dhanbad': 'Dhanbad, Jharkhand',
+        'amritsar': 'Amritsar, Punjab',
+        'jalandhar': 'Jalandhar, Punjab',
+        'allahabad': 'Allahabad, Uttar Pradesh',
+        'prayagraj': 'Allahabad, Uttar Pradesh',
+        'varanasi': 'Varanasi, Uttar Pradesh',
+        'banaras': 'Varanasi, Uttar Pradesh',
+        'howrah': 'Howrah, West Bengal',
+        'durgapur': 'Durgapur, West Bengal',
+        'siliguri': 'Siliguri, West Bengal',
+        'asansol': 'Asansol, West Bengal'
     }
     
-    for keyword, (state, city) in location_mappings.items():
+    for keyword, region in location_mappings.items():
         if keyword in text_lower:
-            return state, city
+            return region
     
-    # Default fallback - could be improved with more sophisticated NLP
-    return 'Delhi', 'New Delhi'
-
-# ---------- TRANSPORT TYPE DETECTION ----------
-def detect_transport_type(text):
-    """
-    Detect transport type from tweet text
-    """
-    text_lower = text.lower()
-    
-    # Metro keywords
-    if any(keyword in text_lower for keyword in ['metro', 'मेट्रो', 'subway', 'dmrc', 'bmrcl', 'kmrl', 'mmrc']):
-        return 'metro'
-    
-    # Train keywords
-    if any(keyword in text_lower for keyword in ['train', 'ट्रेन', 'railway', 'irctc', 'local train', 'express', 'rajdhani', 'shatabdi']):
-        return 'train'
-    
-    # Auto rickshaw keywords
-    if any(keyword in text_lower for keyword in ['auto', 'ऑटो', 'rickshaw', 'three wheeler', 'tuk tuk']):
-        return 'auto'
-    
-    # Taxi keywords
-    if any(keyword in text_lower for keyword in ['taxi', 'टैक्सी', 'cab', 'ola', 'uber', 'car rental']):
-        return 'taxi'
-    
-    # Bus keywords (default)
-    return 'bus'
+    # Default fallback
+    return 'India'
 
 # ---------- SENTIMENT ANALYSIS FUNCTION ----------
 def analyze_sentiment(text):
@@ -223,20 +193,12 @@ try:
     cursor = conn.cursor()
     print("✅ Connected to MySQL.")
 
-    # ---------- CREATE TABLE IF NOT EXISTS ----------
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS tweet_sentiment (
-            id VARCHAR(50) PRIMARY KEY,
-            text TEXT,
-            sentiment VARCHAR(10),
-            created_at DATETIME,
-            author_id VARCHAR(50),
-            state VARCHAR(100),
-            city VARCHAR(100),
-            transport_type VARCHAR(20),
-            polarity DECIMAL(3,2) DEFAULT 0.00
-        )
-    """)
+    # ---------- VERIFY TABLE STRUCTURE ----------
+    cursor.execute("DESCRIBE tweet_sentiment")
+    columns = cursor.fetchall()
+    print("📋 Current table structure:")
+    for col in columns:
+        print(f"   {col[0]} - {col[1]}")
 
     inserted = 0
     for tweet in tweets:
@@ -244,21 +206,15 @@ try:
         text = tweet['text']
         sentiment = analyze_sentiment(text)
         created_at = tweet['created_at'].replace("Z", "")
-        author_id = tweet['author_id']
         
-        # Detect location and transport type
-        state, city = detect_location_from_text(text)
-        transport_type = detect_transport_type(text)
-        
-        # Calculate polarity score
-        blob = TextBlob(text)
-        polarity = blob.sentiment.polarity
+        # Detect region (state/city)
+        region = detect_region_from_text(text)
 
         try:
             cursor.execute("""
-                INSERT INTO tweet_sentiment (id, text, created_at, sentiment, author_id, state, city, transport_type, polarity)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
-            """, (tweet_id, text, created_at, sentiment, author_id, state, city, transport_type, polarity))
+                INSERT INTO tweet_sentiment (id, text, created_at, sentiment, region)
+                VALUES (%s, %s, %s, %s, %s)
+            """, (tweet_id, text, created_at, sentiment, region))
             inserted += 1
         except mysql.connector.IntegrityError:
             # Skip duplicates
@@ -267,24 +223,24 @@ try:
     conn.commit()
     print(f"💾 Uploaded {inserted} new tweet records to MySQL.")
     
-    # Print summary by state
+    # Print summary by region
     cursor.execute("""
-        SELECT state, COUNT(*) as count, 
-               AVG(polarity) as avg_sentiment,
+        SELECT region, COUNT(*) as count, 
                SUM(CASE WHEN sentiment = 'positive' THEN 1 ELSE 0 END) as positive,
                SUM(CASE WHEN sentiment = 'negative' THEN 1 ELSE 0 END) as negative,
                SUM(CASE WHEN sentiment = 'neutral' THEN 1 ELSE 0 END) as neutral
         FROM tweet_sentiment 
-        GROUP BY state 
+        GROUP BY region 
         ORDER BY count DESC
     """)
     
     results = cursor.fetchall()
-    print("\n📊 STATE-WISE SUMMARY:")
+    print("\n📊 REGION-WISE SUMMARY:")
     print("=" * 80)
     for row in results:
-        state, count, avg_sentiment, positive, negative, neutral = row
-        print(f"{state:20} | Messages: {count:4} | Sentiment: {avg_sentiment:+.2f} | +{positive} -{negative} ={neutral}")
+        region, count, positive, negative, neutral = row
+        sentiment_ratio = (positive - negative) / count if count > 0 else 0
+        print(f"{region:30} | Messages: {count:4} | Sentiment: {sentiment_ratio:+.2f} | +{positive} -{negative} ={neutral}")
 
 except mysql.connector.Error as e:
     print("❌ MySQL Error:", e)
