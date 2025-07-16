@@ -206,7 +206,7 @@ export const IndianMapVisualization: React.FC<IndianMapVisualizationProps> = ({
           </div>
           <div className="flex items-center space-x-2">
             <div className="w-4 h-4 rounded-full bg-red-500"></div>
-            <span className="text-sm">Negative (<-0.1)</span>
+            <span className="text-sm">Negative (&lt;-0.1)</span>
           </div>
         </div>
         
